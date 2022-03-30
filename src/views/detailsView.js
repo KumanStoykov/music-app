@@ -20,13 +20,13 @@ const detailTemplate = (song, isOwner, onDelete) => html`
             </div>
 
             ${isOwner
-            ? html `<div class="actionBtn">
-                    <a href="/edit/${song._id}" class="edit">Edit</a>
-                    <a @click=${onDelete} href="javascript:void(0)" class="remove">Delete</a>
-                    </div>`
-            : nothing
-            }
-            
+        ? html`<div class="actionBtn">
+                <a href="/edit/${song._id}" class="edit">Edit</a>
+                <a @click=${onDelete} href="javascript:void(0)" class="remove">Delete</a>
+            </div>`
+        : nothing
+    }
+
         </div>
     </div>
 </section>`;
@@ -34,17 +34,18 @@ const detailTemplate = (song, isOwner, onDelete) => html`
 export const detailView = async (context) => {
     const id = context.params.id;
 
-   const song = await musicServices.getOneSong(id);
-    
+    const song = await musicServices.getOneSong(id);
+
     const isOwner = context.user.id == song._ownerId;
 
     const onDelete = async () => {
-       await musicServices.deletesMusic(id);
-        context.page.redirect('/catalog');
+        const con = confirm(`Are you sure you want to delete ${song.name}!`);
+
+        if (con) {
+            await musicServices.deletesMusic(id);
+            context.page.redirect('/catalog');
+        }
     }
 
     context.render(detailTemplate(song, isOwner, onDelete));
-
-
-
 }
